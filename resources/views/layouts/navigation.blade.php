@@ -56,23 +56,30 @@
                         Users
                     </a>
 
+                    <a href="{{ route('customers.index') }}"
+                       class="text-light text-decoration-none">
+                        <i class="fa-solid fa-user-group"></i>
+                        Customers
+                    </a>
+
                 </div>
 
             </div>
 
             <div class="d-flex align-items-center gap-3">
 
-              @if(Auth::check())
+                @if(Auth::check())
 
-    <span class="text-warning fw-bold">
+                    <span class="text-warning fw-bold">
 
-        <i class="fa-solid fa-user"></i>
+                        <i class="fa-solid fa-user"></i>
 
-        {{ Auth::user()->name }}
+                        {{ Auth::user()->name }}
 
-    </span>
+                    </span>
 
-@endif
+                @endif
+
                 <form method="POST"
                       action="{{ route('logout') }}">
                     @csrf

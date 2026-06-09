@@ -7,6 +7,8 @@ use App\Http\Controllers\ColorController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerAuthController;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Color;
@@ -94,6 +96,55 @@ Route::get(
     [ProductController::class, 'showProduct']
 )->name('store.product');
     });
+    Route::get(
+    '/customer-register',
+    [CustomerAuthController::class, 'registerForm']
+)->name('customer.register.form');
 
+Route::post(
+    '/customer-register',
+    [CustomerAuthController::class, 'register']
+)->name('customer.register');
+Route::get(
+    '/customers',
+    [CustomerController::class, 'index']
+)->name('customers.index');
+
+Route::post(
+    '/customer-logout',
+    [CustomerAuthController::class, 'logout']
+)->name('customer.logout');
+
+Route::middleware('auth:customer')->group(function () {
+
+    Route::get('/customer-home', function () {
+
+        return view('customer.home');
+
+    })->name('customer.home');
+
+    Route::get('/customer-products', function () {
+
+        $products = Product::latest()->get();
+
+        return view(
+            'customer.products',
+            compact('products')
+        );
+
+    })->name('customer.products');
+
+    Route::get('/customer-profile', function () {
+
+        return view('customer.profile');
+
+    })->name('customer.profile');
+
+});
+Route::get('/customer-login', function () {
+
+    return view('customer.login');
+
+})->name('customer.login');
 require __DIR__.'/auth.php';
 Route::resource('users', UserController::class);

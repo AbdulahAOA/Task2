@@ -101,7 +101,16 @@
             </x-primary-button>
 
         </div>
+<div class="mt-4 text-center">
 
+    <a
+        href="/customer-login"
+        class="btn btn-warning"
+    >
+        Customer Login
+    </a>
+
+</div>
     </form>
 
 </x-guest-layout>
