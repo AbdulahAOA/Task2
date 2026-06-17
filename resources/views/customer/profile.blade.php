@@ -44,6 +44,12 @@ use Illuminate\Support\Facades\Auth;
             >
                 Products
             </a>
+            <a
+                     class="nav-link text-white"
+                    href="{{ route('customer.cart') }}"
+>
+                    My Cart
+        </a>
 
             <a
                 class="nav-link text-warning"
@@ -121,6 +127,50 @@ use Illuminate\Support\Facades\Auth;
                 </p>
 
             </div>
+            <hr>
+
+@if(session('success'))
+
+    <div class="alert alert-success">
+
+        {{ session('success') }}
+
+    </div>
+
+@endif
+
+<form
+    action="{{ route('customer.profile.update') }}"
+    method="POST"
+>
+
+    @csrf
+
+    <div class="mb-3">
+
+        <label class="form-label">
+
+            Address
+
+        </label>
+
+        <input
+            type="text"
+            name="address"
+            class="form-control"
+            value="{{ Auth::guard('customer')->user()->address }}"
+        >
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-primary"
+    >
+        Save Address
+    </button>
+
+</form>
 
         </div>
 

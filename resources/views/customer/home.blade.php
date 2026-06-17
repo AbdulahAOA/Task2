@@ -44,7 +44,12 @@ use Illuminate\Support\Facades\Auth;
             >
                 Products
             </a>
-
+             <a
+                  class="nav-link text-white"
+                  href="{{ route('customer.cart') }}"
+>
+                         My Cart
+                </a>
             <a
                 class="nav-link text-white"
                 href="{{ route('customer.profile') }}"

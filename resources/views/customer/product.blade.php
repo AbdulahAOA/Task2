@@ -1,11 +1,57 @@
-<x-app-layout>
+<!DOCTYPE html>
+<html>
 
-```
-<x-slot name="header">
-    <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-        🛍️ {{ $product->name_en }}
-    </h2>
-</x-slot>
+<head>
+
+    <title>{{ $product->name_en }}</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand text-warning fw-bold"
+            href="{{ route('customer.home') }}"
+        >
+            Customer Panel
+        </a>
+
+        <div class="navbar-nav ms-auto">
+
+            <a class="nav-link text-white"
+               href="{{ route('customer.home') }}">
+                Home
+            </a>
+
+            <a class="nav-link text-white"
+               href="{{ route('customer.products') }}">
+                Products
+            </a>
+
+            <a class="nav-link text-white"
+               href="{{ route('customer.cart') }}">
+                My Cart
+            </a>
+
+            <a class="nav-link text-white"
+               href="{{ route('customer.profile') }}">
+                My Profile
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
 
 <div class="container mt-4">
 
@@ -167,6 +213,11 @@
 
     </div>
 
+    <form
+    action="{{ route('cart.add', $product->id) }}"
+    method="POST"
+>
+    @csrf
     <div class="card-body">
 
         <div class="mb-3">
@@ -175,15 +226,17 @@
                 Select Color
             </label>
 
-            <select class="form-select">
+            <select
+                name="color_id"
+                     class="form-select"
+                        >
+@foreach($product->colors as $color)
 
-                @foreach($product->colors as $color)
+    <option value="{{ $color->id }}">
+        {{ $color->name_en }}
+    </option>
 
-                    <option>
-                        {{ $color->name_en }}
-                    </option>
-
-                @endforeach
+@endforeach
 
             </select>
 
@@ -195,15 +248,20 @@
                 Select Size
             </label>
 
-            <select class="form-select">
+            <select
+                  name="size_id"
+                    class="form-select"
+                    >
 
-                @foreach($product->prices as $price)
+ @foreach($product->prices as $price)
 
-                    <option>
-                        {{ $price->size->name_en }}
-                    </option>
+    <option value="{{ $price->size->id }}">
+        {{ $price->size->name_en }}
+        -
+        {{ $price->price }} JD
+    </option>
 
-                @endforeach
+@endforeach
 
             </select>
 
@@ -215,20 +273,24 @@
                 Quantity
             </label>
 
-            <input
-                type="number"
-                class="form-control"
-                value="1"
-                min="1"
-            >
+         <input
+          type="number"
+          name="quantity"
+           class="form-control"
+           value="1"
+            min="1"
+          >
 
         </div>
 
-        <button
-            class="btn btn-warning w-100"
-        >
-            Add To Cart
+       <button
+    type="submit"
+          class="btn btn-warning w-100"
+                >
+              Add To Cart
         </button>
+
+                </form>
 
     </div>
 
@@ -245,4 +307,5 @@
 </div>
 ```
 
-</x-app-layout>
+</body>
+</html>

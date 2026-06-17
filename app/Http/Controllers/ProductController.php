@@ -187,19 +187,32 @@ public function storeFront()
  */
 public function showProduct(Product $product)
 {
-    $product->load([
-        'images',
-        'colors',
-        'prices.size',
-        'variationQuantities.color',
-        'variationQuantities.size'
-    ]);
+$product->load([
+'images',
+'colors',
+'prices.size',
+'variationQuantities.color',
+'variationQuantities.size'
+]);
+
+
+if (auth('customer')->check()) {
 
     return view(
-        'store.product',
+        'customer.product',
         compact('product')
     );
+
 }
+
+return view(
+    'store.product',
+    compact('product')
+);
+
+
+}
+
 
 public function edit(Product $product)
 {

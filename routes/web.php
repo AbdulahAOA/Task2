@@ -7,6 +7,7 @@ use App\Http\Controllers\ColorController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerAuthController;
 use App\Models\Category;
@@ -91,11 +92,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/products/delete/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
 
-Route::get(
+
+    });
+    Route::get(
     '/product/{product}',
     [ProductController::class, 'showProduct']
 )->name('store.product');
-    });
     Route::get(
     '/customer-register',
     [CustomerAuthController::class, 'registerForm']
@@ -117,30 +119,58 @@ Route::post(
 
 Route::middleware('auth:customer')->group(function () {
 
-    Route::get('/customer-home', function () {
+Route::delete(
+    '/cart-item/{item}',
+    [CartController::class, 'remove']
+)->name('cart.remove');
+Route::get('/customer-home', function () {
 
-        return view('customer.home');
+    return view('customer.home');
 
-    })->name('customer.home');
+})->name('customer.home');
 
-    Route::get('/customer-products', function () {
+Route::get('/customer-products', function () {
 
-        $products = Product::latest()->get();
+    $products = Product::with('images')
+        ->latest()
+        ->get();
 
-        return view(
-            'customer.products',
-            compact('products')
-        );
+    return view(
+        'customer.products',
+        compact('products')
+    );
 
-    })->name('customer.products');
+})->name('customer.products');
 
-    Route::get('/customer-profile', function () {
+Route::get(
+    '/customer-product/{product}',
+    [ProductController::class, 'showProduct']
+)->name('customer.product');
 
-        return view('customer.profile');
+Route::get('/customer-profile', function () {
 
-    })->name('customer.profile');
+    return view('customer.profile');
+
+})->name('customer.profile');
+
+Route::post(
+    '/customer-profile/update',
+    [CustomerController::class, 'updateProfile']
+)->name('customer.profile.update');
+Route::post(
+    '/cart/add/{product}',
+    [CartController::class, 'add']
+)->name('cart.add');
+
+Route::get(
+    '/customer-cart',
+    [CartController::class, 'index']
+)->name('customer.cart');
 
 });
+
+
+  
 Route::get('/customer-login', function () {
 
     return view('customer.login');
@@ -148,3 +178,20 @@ Route::get('/customer-login', function () {
 })->name('customer.login');
 require __DIR__.'/auth.php';
 Route::resource('users', UserController::class);
+Route::get(
+    '/customers/{customer}/cart',
+    [CustomerController::class, 'cart']
+)->name('customers.cart');
+Route::post(
+    '/cart/increase/{item}',
+    [CartController::class, 'increase']
+)->name('cart.increase');
+
+Route::post(
+    '/cart/decrease/{item}',
+    [CartController::class, 'decrease']
+)->name('cart.decrease');
+Route::post(
+    '/checkout',
+    [CartController::class, 'checkout']
+)->name('checkout');

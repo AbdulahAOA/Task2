@@ -14,6 +14,7 @@ class Customer extends Authenticatable
         'name',
         'phone',
         'email',
+        'address',
         'password',
 
     ];
@@ -24,4 +25,14 @@ class Customer extends Authenticatable
         'remember_token',
 
     ];
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

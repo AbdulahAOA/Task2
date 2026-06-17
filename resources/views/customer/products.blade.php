@@ -40,7 +40,12 @@
             >
                 Products
             </a>
-
+        <a
+             class="nav-link text-white"
+                href="{{ route('customer.cart') }}"
+        >
+             My Cart
+                </a>
             <a
                 class="nav-link text-white"
                 href="{{ route('customer.profile') }}"
@@ -85,7 +90,25 @@
                 <div class="card shadow h-100">
 
                     <div class="card-body">
+                            @if($product->images->count())
 
+    <img
+        src="{{ asset('storage/' . $product->images->first()->image) }}"
+        class="card-img-top"
+        style="height:250px;object-fit:cover;"
+        alt="{{ $product->name_en }}"
+    >
+
+@else
+
+    <img
+        src="https://via.placeholder.com/400x250?text=No+Image"
+        class="card-img-top"
+        style="height:250px;object-fit:cover;"
+        alt="No Image"
+    >
+
+@endif
                         <h5 class="fw-bold">
                             {{ $product->name_en }}
                         </h5>
@@ -93,6 +116,15 @@
                         <p class="text-muted">
                             {{ $product->description_en }}
                         </p>
+                <a
+            href="{{ route('customer.product', $product->id) }}"
+                    class="btn btn-primary w-100"
+
+              >
+
+              View Product
+
+                </a>
 
                     </div>
 
