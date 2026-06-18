@@ -30,38 +30,57 @@
 
                 <div class="card-body">
 
-                    <form>
+                 <form
+    action="{{ route('customer.login') }}"
+    method="POST"
+>
 
-                        <div class="mb-3">
+    @csrf
 
-                            <label>Email</label>
+    @if ($errors->any())
 
-                            <input
-                                type="email"
-                                class="form-control"
-                            >
+        <div class="alert alert-danger">
 
-                        </div>
+            {{ $errors->first() }}
 
-                        <div class="mb-3">
+        </div>
 
-                            <label>Password</label>
+    @endif
 
-                            <input
-                                type="password"
-                                class="form-control"
-                            >
+    <div class="mb-3">
 
-                        </div>
+        <label>Email</label>
 
-                        <button
-                            type="submit"
-                            class="btn btn-warning w-100"
-                        >
-                            Login
-                        </button>
+        <input
+            type="email"
+            name="email"
+            class="form-control"
+            required
+        >
 
-                    </form>
+    </div>
+
+    <div class="mb-3">
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            name="password"
+            class="form-control"
+            required
+        >
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-warning w-100"
+    >
+        Login
+    </button>
+
+</form>
 
                     <hr>
 

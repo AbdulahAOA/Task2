@@ -13,36 +13,43 @@ class StoreCategoryRequest extends FormRequest
     }
 
     public function rules(): array
-    {
-        return [
+{
+    return [
 
-            'parent_category_id' => [
-                'nullable',
-                'exists:categories,id'
-            ],
+        'parent_category_id' => [
+            'nullable',
+            'exists:categories,id'
+        ],
 
-            'name_ar' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:categories,name_ar'
-            ],
+        'code' => [
+            'required',
+            'string',
+            'max:50',
+            'unique:categories,code'
+        ],
 
-            'name_en' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:categories,name_en'
-            ],
+        'name_ar' => [
+            'required',
+            'string',
+            'max:255',
+            'unique:categories,name_ar'
+        ],
 
-            'status' => [
-                'required',
-                'integer',
-                'in:1,2'
-            ],
+        'name_en' => [
+            'required',
+            'string',
+            'max:255',
+            'unique:categories,name_en'
+        ],
 
-        ];
-    }
+        'status' => [
+            'required',
+            'integer',
+            'in:1,2'
+        ],
+
+    ];
+}
 
     public function messages(): array
     {

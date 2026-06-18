@@ -216,20 +216,55 @@ return view(
 
 public function edit(Product $product)
 {
+    $categories = Category::where(
+        'status',
+        1
+    )->get();
+
+    $colors = Color::where(
+        'status',
+        1
+    )->get();
+
+    $sizes = Size::where(
+        'status',
+        1
+    )->get();
+
+    $product->load([
+        'colors',
+        'prices',
+        'variationQuantities',
+        'images'
+    ]);
+
     return view(
         'products.edit',
-        compact('product')
+        compact(
+            'product',
+            'categories',
+            'colors',
+            'sizes'
+        )
     );
 }
 
 public function update(Request $request, Product $product)
 {
     $product->update([
+
+        'category_id' => $request->category_id,
+
         'name_ar' => $request->name_ar,
+
         'name_en' => $request->name_en,
+
         'description_ar' => $request->description_ar,
+
         'description_en' => $request->description_en,
+
         'status' => $request->status,
+
     ]);
 
     return redirect()

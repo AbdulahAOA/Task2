@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerAuthController;
+use App\Http\Controllers\CouponController;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Color;
@@ -91,7 +92,20 @@ Route::middleware('auth')->group(function () {
     Route::put('/products/update/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/delete/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
+Route::get(
+    '/coupons',
+    [CouponController::class, 'index']
+)->name('coupons.index');
 
+Route::get(
+    '/coupons/create',
+    [CouponController::class, 'create']
+)->name('coupons.create');
+
+Route::post(
+    '/coupons/store',
+    [CouponController::class, 'store']
+)->name('coupons.store');
 
     });
     Route::get(
@@ -176,6 +190,10 @@ Route::get('/customer-login', function () {
     return view('customer.login');
 
 })->name('customer.login');
+Route::post(
+    '/customer-login',
+    [CustomerAuthController::class, 'login']
+);
 require __DIR__.'/auth.php';
 Route::resource('users', UserController::class);
 Route::get(
@@ -195,3 +213,21 @@ Route::post(
     '/checkout',
     [CartController::class, 'checkout']
 )->name('checkout');
+Route::post(
+    '/coupon/check',
+    [CouponController::class, 'check']
+)->name('coupon.check');
+Route::get(
+    '/coupons/edit/{coupon}',
+    [CouponController::class, 'edit']
+)->name('coupons.edit');
+
+Route::put(
+    '/coupons/update/{coupon}',
+    [CouponController::class, 'update']
+)->name('coupons.update');
+
+Route::delete(
+    '/coupons/delete/{coupon}',
+    [CouponController::class, 'destroy']
+)->name('coupons.destroy');

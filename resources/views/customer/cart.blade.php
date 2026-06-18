@@ -82,6 +82,15 @@
     <h2 class="mb-4">
         My Cart
     </h2>
+    @if(session('success'))
+
+    <div class="alert alert-success">
+
+        {{ session('success') }}
+
+    </div>
+
+@endif
 
     @if($cart && $cart->items->count())
 
@@ -156,17 +165,21 @@
             @csrf
 
             <button
-                type="submit"
-                class="btn btn-warning btn-sm"
-            >
+                type="button"
+                class="btn btn-warning btn-sm decrease-btn"
+                 data-id="{{ $item->id }}"
+                >
                 -
             </button>
 
         </form>
 
-        <strong>
-            {{ $item->quantity }}
-        </strong>
+       <strong
+    class="quantity-text"
+    data-id="{{ $item->id }}"
+            >
+    {{ $item->quantity }}
+            </strong>
 
         <form
             action="{{ route('cart.increase', $item->id) }}"
@@ -175,10 +188,11 @@
             @csrf
 
             <button
-                type="submit"
-                class="btn btn-success btn-sm"
+                     type="button"
+                class="btn btn-success btn-sm increase-btn"
+             data-id="{{ $item->id }}"
             >
-                +
+         +
             </button>
 
         </form>
@@ -186,7 +200,11 @@
     </div>
 
 </td>
-<td>
+<td
+    class="subtotal"
+    data-id="{{ $item->id }}"
+    data-price="{{ $item->price }}"
+>
     {{ $item->price * $item->quantity }} JD
 </td>
 <td>
@@ -248,12 +266,36 @@ $total = $cart->items->sum(function ($item) {
 <h4>
 
     Total:
-    <span class="text-success">
-        {{ $total }} JD
-    </span>
+    <span
+    class="text-success"
+    id="cart-total"
+>
+    {{ $total }} JD
+</span>
 
 </h4>
+<div class="mb-3">
 
+    <label class="form-label">
+        Coupon Code
+    </label>
+
+    <input
+        type="text"
+        id="coupon-code"
+        class="form-control"
+        placeholder="Enter Coupon"
+    >
+
+</div>
+
+<button
+    type="button"
+    id="apply-coupon"
+    class="btn btn-primary mb-3"
+>
+    Apply Coupon
+</button>
 <form
     action="{{ route('checkout') }}"
     method="POST"
@@ -276,7 +318,158 @@ $total = $cart->items->sum(function ($item) {
 
 
 </div>
+<script>
 
+document
+    .querySelectorAll('.increase-btn')
+    .forEach(button => {
+
+        button.addEventListener('click', function () {
+
+            fetch(
+                '/cart/increase/' + this.dataset.id,
+                {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }
+            )
+            .then(response => response.json())
+            .then(data => {
+
+               document
+    .querySelector(
+        '.quantity-text[data-id="' +
+        button.dataset.id +
+        '"]'
+    )
+    .innerText = data.quantity;
+
+const subtotalCell = document.querySelector(
+    '.subtotal[data-id="' +
+    button.dataset.id +
+    '"]'
+);
+
+const price = parseFloat(
+    subtotalCell.dataset.price
+);
+
+subtotalCell.innerText =
+    (price * data.quantity) + ' JD';
+
+document
+    .getElementById('cart-total')
+    .innerText = data.total + ' JD';
+
+                console.log(data);
+
+                if (data.total) {
+
+                    document
+                        .getElementById('cart-total')
+                        .innerText =
+                        data.total + ' JD';
+                  
+                }
+
+            });
+
+        });
+
+    });
+
+document
+    .querySelectorAll('.decrease-btn')
+    .forEach(button => {
+
+        button.addEventListener('click', function () {
+
+            fetch(
+                '/cart/decrease/' + this.dataset.id,
+                {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }
+            )
+            .then(response => response.json())
+          .then(data => {
+
+    document
+        .querySelector(
+            '.quantity-text[data-id="' +
+            button.dataset.id +
+            '"]'
+        )
+        .innerText = data.quantity;
+
+    const subtotalCell = document.querySelector(
+        '.subtotal[data-id="' +
+        button.dataset.id +
+        '"]'
+    );
+
+    const price = parseFloat(
+        subtotalCell.dataset.price
+    );
+
+    subtotalCell.innerText =
+        (price * data.quantity) + ' JD';
+
+    document
+        .getElementById('cart-total')
+        .innerText =
+        data.total + ' JD';
+
+});
+        });
+
+    });
+
+document
+    .getElementById('apply-coupon')
+    .addEventListener('click', function () {
+
+        fetch(
+            '/coupon/check',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type':
+                        'application/json',
+                    'X-CSRF-TOKEN':
+                        '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    code: document
+                        .getElementById(
+                            'coupon-code'
+                        )
+                        .value
+                })
+            }
+        )
+        .then(response => response.json())
+        .then(data => {
+
+    if (!data.success) {
+
+        alert(data.message);
+
+        return;
+    }
+
+alert('Coupon Applied Successfully');
+
+            });
+
+          });
+
+</script>
 </body>
 
 </html>
+

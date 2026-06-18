@@ -19,11 +19,13 @@ class Category extends Model
     */
     protected $fillable = [
         'parent_category_id',
+        'code',
         'name_ar',
         'name_en',
         'status',
         'created_by',
         'updated_by',
+        
     ];
 
     /*

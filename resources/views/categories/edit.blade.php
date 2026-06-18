@@ -103,7 +103,36 @@
                         </select>
 
                     </div>
+                      <div class="col-md-6 mb-3">
 
+    <label class="form-label">
+        Category Code
+    </label>
+
+                <input
+                    type="text"
+                    name="code"
+                    class="form-control"
+                    value="{{ old('code', $category->code) }}"
+                    required
+                    >
+
+                            </div>
+                            <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Category Code
+                            </label>
+
+                        <input
+                            type="text"
+                            name="code"
+                            class="form-control"
+                            value="{{ old('code', $category->code) }}"
+                            required
+                        >
+
+                    </div>
                     <div class="col-md-6 mb-3">
 
                         <label class="form-label">

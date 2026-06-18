@@ -38,6 +38,7 @@
 
                     <tr>
                         <th>ID</th>
+                        <th>Code</th>
                         <th>Name</th>
                         <th>Status</th>
                         <th width="220">Actions</th>
@@ -54,7 +55,9 @@
                             <td>
                                 {{ $category->id }}
                             </td>
-
+                             <td>
+                                 {{ $category->code }}
+                                </td>
                             <td>
                                 {{ $category->name_en }}
                             </td>

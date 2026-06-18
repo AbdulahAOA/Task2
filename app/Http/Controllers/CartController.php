@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Coupon;
 class CartController extends Controller
 {
 public function add(Request $request, Product $product)
@@ -101,7 +102,17 @@ public function increase(CartItem $item)
 
     }
 
-    return back();
+ $total = $item->cart->items->sum(function ($cartItem) {
+
+    return $cartItem->price * $cartItem->quantity;
+
+});
+
+return response()->json([
+    'success'  => true,
+    'quantity' => $item->quantity,
+    'total'    => $total,
+]);
 }
 
 public function decrease(CartItem $item)
@@ -115,8 +126,18 @@ public function decrease(CartItem $item)
         $item->delete();
 
     }
+$cart = $item->cart;
 
-    return back();
+$total = $cart->items->sum(function ($cartItem) {
+
+    return $cartItem->price * $cartItem->quantity;
+
+});
+return response()->json([
+    'success'  => true,
+    'quantity' => $item->exists ? $item->quantity : 0,
+    'total'    => $total,
+]);
 }
 public function checkout()
 {
@@ -142,12 +163,68 @@ public function checkout()
         return $item->price * $item->quantity;
 
     });
+     $coupon = null;
 
+if (session()->has('coupon_id')) {
+
+    $coupon = Coupon::find(
+        session('coupon_id')
+    );
+
+    if ($coupon) {
+
+        if ($coupon->category_id) {
+
+            $categoryTotal = $cart->items
+                ->filter(function ($item) use ($coupon) {
+
+                    return $item->product->category_id
+                        == $coupon->category_id;
+
+                })
+                ->sum(function ($item) {
+
+                    return $item->price *
+                           $item->quantity;
+
+                });
+
+        } else {
+
+            $categoryTotal = $total;
+
+        }
+
+        if ($coupon->type === 'percent') {
+
+            $discount =
+                $categoryTotal *
+                $coupon->value / 100;
+
+        } else {
+
+            $discount =
+                $coupon->value;
+
+            if ($discount > $categoryTotal) {
+
+                $discount = $categoryTotal;
+
+            }
+
+        }
+
+        $total = $total - $discount;
+
+    }
+
+}
+   
     $order = Order::create([
-
+     
         'customer_id' => $customer->id,
         'total'       => $total,
-        'address'     => $customer->address,
+        'address' => $customer->address ?? 'No Address',
         'status'      => 'pending',
 
     ]);
@@ -180,11 +257,26 @@ if ($stock) {
 }
    
         }
+if ($coupon) {
+
+    $coupon->increment(
+        'used_count'
+    );
+
+    session()->forget(
+        'coupon_id'
+    );
+
+}
 
     $cart->items()->delete();
 
- return redirect()->route(
-    'customer.cart'
-);
+return redirect()
+    ->route('customer.cart')
+    ->with(
+        'success',
+        'Order created successfully. Total: '
+        . $total . ' JD'
+    );
 }
 }

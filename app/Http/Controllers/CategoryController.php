@@ -45,6 +45,7 @@ public function store(StoreCategoryRequest $request)
         */
         Category::create([
             'parent_category_id' => $request->parent_category_id,
+             'code' => strtoupper($request->code),
             'name_ar' => $request->name_ar,
             'name_en' => $request->name_en,
             'status' => $request->status,
@@ -96,6 +97,7 @@ public function update(
         */
         $category->update([
             'parent_category_id' => $request->parent_category_id,
+            'code' => strtoupper($request->code),
             'name_ar' => $request->name_ar,
             'name_en' => $request->name_en,
             'status' => $request->status,

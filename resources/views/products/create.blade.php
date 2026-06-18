@@ -61,7 +61,7 @@
                             @foreach($categories as $category)
 
                                 <option value="{{ $category->id }}">
-                                    {{ $category->name_en }}
+                                    {{ $category->code }} - {{ $category->name_en }}
                                 </option>
 
                             @endforeach

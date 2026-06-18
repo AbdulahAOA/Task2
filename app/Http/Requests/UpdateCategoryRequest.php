@@ -34,6 +34,14 @@ class UpdateCategoryRequest extends FormRequest
             'nullable',
             'exists:categories,id'
         ],
+                    'code' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique('categories', 'code')
+                        ->ignore($category),
+                                 ],
+
 
         /*
         |--------------------------------------------------------------------------

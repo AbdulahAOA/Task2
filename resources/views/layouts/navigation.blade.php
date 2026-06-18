@@ -12,7 +12,7 @@
                     Product System
                 </a>
 
-                <div class="d-none d-md-flex gap-4">
+                <div class="d-none d-md-flex gap-4 mx-auto">
 
                     <a href="{{ route('dashboard') }}"
                        class="text-light text-decoration-none">
@@ -61,7 +61,11 @@
                         <i class="fa-solid fa-user-group"></i>
                         Customers
                     </a>
-
+                   <a href="{{ route('coupons.index') }}"
+                     class="text-light text-decoration-none">
+                        <i class="fa-solid fa-ticket"></i>
+                       Coupons
+                        </a>
                 </div>
 
             </div>
