@@ -254,18 +254,84 @@ public function update(Request $request, Product $product)
     $product->update([
 
         'category_id' => $request->category_id,
-
         'name_ar' => $request->name_ar,
-
         'name_en' => $request->name_en,
-
         'description_ar' => $request->description_ar,
-
         'description_en' => $request->description_en,
-
         'status' => $request->status,
 
     ]);
+
+    ProductColor::where(
+        'product_id',
+        $product->id
+    )->delete();
+
+    if ($request->has('colors')) {
+
+        foreach ($request->colors as $colorId) {
+
+            ProductColor::create([
+
+                'product_id' => $product->id,
+                'color_id' => $colorId,
+                'created_by' => auth()->id(),
+
+            ]);
+        }
+    }
+
+    ProductPrice::where(
+        'product_id',
+        $product->id
+    )->delete();
+
+    if ($request->has('prices')) {
+
+        foreach ($request->prices as $sizeId => $price) {
+
+            if (!empty($price)) {
+
+                ProductPrice::create([
+
+                    'product_id' => $product->id,
+                    'size_id' => $sizeId,
+                    'price' => $price,
+                    'on_sale_status' => 2,
+                    'created_by' => auth()->id(),
+
+                ]);
+            }
+        }
+    }
+
+    ProductVariationQuantity::where(
+        'product_id',
+        $product->id
+    )->delete();
+
+    if ($request->has('quantities')) {
+
+        foreach ($request->quantities as $colorId => $sizes) {
+
+            foreach ($sizes as $sizeId => $quantity) {
+
+                if ($quantity !== null && $quantity !== '') {
+
+                    ProductVariationQuantity::create([
+
+                        'product_id' => $product->id,
+                        'color_id' => $colorId,
+                        'size_id' => $sizeId,
+                        'quantity' => $quantity,
+                        'status' => 1,
+                        'created_by' => auth()->id(),
+
+                    ]);
+                }
+            }
+        }
+    }
 
     return redirect()
         ->route('products.index')

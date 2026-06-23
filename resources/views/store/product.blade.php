@@ -224,11 +224,12 @@
 
         </div>
 
-        <button
-            class="btn btn-warning w-100"
-        >
-            Add To Cart
-        </button>
+        <a
+    href="{{ route('customer.login') }}"
+    class="btn btn-warning w-100"
+            >
+    Login To Purchase
+                    </a>
 
     </div>
 

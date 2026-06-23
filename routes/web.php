@@ -15,15 +15,29 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Color;
 use App\Models\Size;
+use App\Models\Customer;
+use App\Models\Order;
+use App\Models\Coupon;
+
 Route::get('/', [ProductController::class, 'storeFront'])
     ->name('store.home');
 Route::get('/dashboard', function () {
-
+$latestOrders = Order::with('customer')
+    ->latest()
+    ->take(5)
+    ->get();
     return view('dashboard', [
+
         'categoriesCount' => Category::count(),
         'productsCount' => Product::count(),
         'colorsCount' => Color::count(),
         'sizesCount' => Size::count(),
+
+        'customersCount' => Customer::count(),
+        'ordersCount' => Order::count(),
+        'couponsCount' => Coupon::count(),
+        'revenue' => Order::sum('total'),
+        'latestOrders' => $latestOrders,
     ]);
 
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -91,7 +105,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/products/edit/{product}', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/update/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/delete/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-
+    Route::get(
+    '/orders',
+    [CartController::class, 'orders']
+)->name('orders.index');
+Route::get(
+    '/orders/{order}',
+    [CartController::class, 'orderDetails']
+)->name('orders.details');
 Route::get(
     '/coupons',
     [CouponController::class, 'index']
@@ -112,6 +133,15 @@ Route::post(
     '/product/{product}',
     [ProductController::class, 'showProduct']
 )->name('store.product');
+Route::get(
+    '/customer-login',
+    [CustomerAuthController::class, 'loginForm']
+)->name('customer.login');
+
+Route::post(
+    '/customer-login',
+    [CustomerAuthController::class, 'login']
+)->name('customer.login.submit');
     Route::get(
     '/customer-register',
     [CustomerAuthController::class, 'registerForm']
@@ -181,19 +211,29 @@ Route::get(
     [CartController::class, 'index']
 )->name('customer.cart');
 
+Route::get(
+    '/customer-addresses',
+    [CustomerController::class, 'addresses']
+)->name('customer.addresses');
+
+Route::get(
+    '/customer-addresses/create',
+    [CustomerController::class, 'createAddress']
+)->name('customer.addresses.create');
+
+Route::post(
+    '/customer-addresses/store',
+    [CustomerController::class, 'storeAddress']
+)->name('customer.addresses.store');
+
+Route::delete(
+    '/customer-addresses/{address}',
+    [CustomerController::class, 'deleteAddress']
+)->name('customer.addresses.delete');
+
+
 });
 
-
-  
-Route::get('/customer-login', function () {
-
-    return view('customer.login');
-
-})->name('customer.login');
-Route::post(
-    '/customer-login',
-    [CustomerAuthController::class, 'login']
-);
 require __DIR__.'/auth.php';
 Route::resource('users', UserController::class);
 Route::get(

@@ -44,32 +44,28 @@ class CustomerAuthController extends Controller
         return redirect()->route('customer.home');
     }
 
-    public function login(Request $request)
-    {
-        $request->validate([
+public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-            'email' => 'required|email',
-            'password' => 'required',
-
-        ]);
-
-        if (Auth::guard('customer')->attempt([
-
+    if (
+        Auth::guard('customer')->attempt([
             'email' => $request->email,
             'password' => $request->password,
+        ])
+    ) {
+        $request->session()->regenerate();
 
-        ])) {
-
-            $request->session()->regenerate();
-
-            return redirect()->route('customer.home');
-        }
-
-        return back()->withErrors([
-            'email' => 'Invalid credentials'
-        ]);
+        return redirect()->route('customer.home');
     }
 
+    return back()->withErrors([
+        'email' => 'These credentials do not match our records.'
+    ])->withInput();
+}
     public function logout()
     {
         Auth::guard('customer')->logout();

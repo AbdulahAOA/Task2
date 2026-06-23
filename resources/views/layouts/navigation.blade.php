@@ -1,101 +1,144 @@
-<nav x-data="{ open: false }" class="bg-dark shadow">
 
+@if(Auth::check())
+<nav style="
+    background: rgba(0, 0, 0, 0.88) !important;
+    backdrop-filter: blur(15px);
+    border-bottom: 2px solid #ffc107;
+    padding: 12px 0;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+">
     <div class="container">
 
-        <div class="d-flex justify-content-between align-items-center py-3">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
 
-            <div class="d-flex align-items-center gap-4">
+            {{-- Brand --}}
+            <a href="{{ route('dashboard') }}"
+               style="color: #ffc107; text-decoration: none; font-weight: 800; font-size: 1.4rem;">
+                🏪 Product System
+            </a>
+
+            {{-- Nav Links --}}
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
 
                 <a href="{{ route('dashboard') }}"
-                   class="text-warning text-decoration-none fw-bold fs-4">
-                    <i class="fa-solid fa-store"></i>
-                    Product System
+                   style="color: rgba(255,255,255,0.7); text-decoration:none; padding:6px 12px; border-radius:8px; font-weight:500;">
+                    📊 Dashboard
                 </a>
 
-                <div class="d-none d-md-flex gap-4 mx-auto">
-
-                    <a href="{{ route('dashboard') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-gauge"></i>
-                        Dashboard
+                <div class="dropdown">
+                    <a href="#"
+                       data-bs-toggle="dropdown"
+                       style="color: rgba(255,255,255,0.7); text-decoration:none; padding:6px 12px; border-radius:8px; font-weight:500;">
+                        📦 Catalog ▼
                     </a>
 
-                    <a href="{{ route('store.home') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-shop"></i>
-                        Store
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('products.index') }}">
+                                Products
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('categories.index') }}">
+                                Categories
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('colors.index') }}">
+                                Colors
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('sizes.index') }}">
+                                Sizes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dropdown">
+                    <a href="#"
+                       data-bs-toggle="dropdown"
+                       style="color: rgba(255,255,255,0.7); text-decoration:none; padding:6px 12px; border-radius:8px; font-weight:500;">
+                        👥 People ▼
                     </a>
 
-                    <a href="{{ route('products.index') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-box"></i>
-                        Products
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('users.index') }}">
+                                Users
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('customers.index') }}">
+                                Customers
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dropdown">
+                    <a href="#"
+                       data-bs-toggle="dropdown"
+                       style="color: rgba(255,255,255,0.7); text-decoration:none; padding:6px 12px; border-radius:8px; font-weight:500;">
+                        💰 Sales ▼
                     </a>
 
-                    <a href="{{ route('categories.index') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-folder"></i>
-                        Categories
-                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('orders.index') }}">
+                                Orders
+                            </a>
+                        </li>
 
-                    <a href="{{ route('colors.index') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-palette"></i>
-                        Colors
-                    </a>
-
-                    <a href="{{ route('sizes.index') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-ruler"></i>
-                        Sizes
-                    </a>
-
-                    <a href="{{ route('users.index') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-users"></i>
-                        Users
-                    </a>
-
-                    <a href="{{ route('customers.index') }}"
-                       class="text-light text-decoration-none">
-                        <i class="fa-solid fa-user-group"></i>
-                        Customers
-                    </a>
-                   <a href="{{ route('coupons.index') }}"
-                     class="text-light text-decoration-none">
-                        <i class="fa-solid fa-ticket"></i>
-                       Coupons
-                        </a>
+                        <li>
+                            <a class="dropdown-item"
+                               href="{{ route('coupons.index') }}">
+                                Coupons
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
             </div>
 
-            <div class="d-flex align-items-center gap-3">
+            {{-- User & Logout --}}
+            <div style="display:flex; align-items:center; gap:12px;">
 
                 @if(Auth::check())
-
-                    <span class="text-warning fw-bold">
-
-                        <i class="fa-solid fa-user"></i>
-
-                        {{ Auth::user()->name }}
-
+                    <span style="color:#ffc107; font-weight:600;">
+                        👤 {{ Auth::user()->name }}
                     </span>
-
                 @endif
 
                 <form method="POST"
-                      action="{{ route('logout') }}">
+                      action="{{ route('logout') }}"
+                      style="margin:0;">
                     @csrf
 
-                    <button
-                        type="submit"
-                        class="btn btn-danger btn-sm"
-                    >
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        Logout
+                    <button type="submit"
+                            style="
+                                background: rgba(239, 68, 68, 0.15);
+                                border: 1px solid rgba(239, 68, 68, 0.2);
+                                color: #ef4444;
+                                padding: 6px 16px;
+                                border-radius: 8px;
+                                font-weight: 600;
+                                cursor: pointer;
+                            ">
+                        🚪 Logout
                     </button>
-
                 </form>
 
             </div>
@@ -103,5 +146,5 @@
         </div>
 
     </div>
-
 </nav>
+@endif

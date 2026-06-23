@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Coupon;
+use App\Models\CustomerAddress;
 class CartController extends Controller
 {
 public function add(Request $request, Product $product)
@@ -77,10 +78,18 @@ public function add(Request $request, Product $product)
         $customer->id
     )->first();
 
-    return view(
-        'customer.cart',
-        compact('cart')
-    );
+ $addresses = CustomerAddress::where(
+    'customer_id',
+    $customer->id
+)->get();
+
+return view(
+    'customer.cart',
+    compact(
+        'cart',
+        'addresses'
+    )
+);
 }
 public function remove(CartItem $item)
 {
@@ -142,7 +151,27 @@ return response()->json([
 public function checkout()
 {
     $customer = Auth::guard('customer')->user();
+        $selectedAddress = CustomerAddress::where(
+            'id',
+            request('address_id')
+        )
+        ->where(
+            'customer_id',
+            $customer->id
+        )
+        ->first();
 
+        if (!$selectedAddress) {
+
+            return back()->with(
+                'error',
+                'Please select an address.'
+            );
+
+        }
+   
+   
+  
     $cart = Cart::with(
         'items'
     )->where(
@@ -163,6 +192,9 @@ public function checkout()
         return $item->price * $item->quantity;
 
     });
+    $originalTotal = $total;
+    $discountAmount = 0;
+    $discountPercent = 0;
      $coupon = null;
 
 if (session()->has('coupon_id')) {
@@ -200,7 +232,7 @@ if (session()->has('coupon_id')) {
             $discount =
                 $categoryTotal *
                 $coupon->value / 100;
-
+                $discountPercent = $coupon->value;
         } else {
 
             $discount =
@@ -213,21 +245,41 @@ if (session()->has('coupon_id')) {
             }
 
         }
-
+        $discountAmount = $discount;
         $total = $total - $discount;
 
     }
 
 }
-   
-    $order = Order::create([
-     
-        'customer_id' => $customer->id,
-        'total'       => $total,
-        'address' => $customer->address ?? 'No Address',
-        'status'      => 'pending',
+  foreach ($cart->items as $item) {
 
-    ]);
+    $stock = $item->product
+        ->variationQuantities()
+        ->where('color_id', $item->color_id)
+        ->where('size_id', $item->size_id)
+        ->first();
+
+    if (!$stock || $stock->quantity < $item->quantity) {
+
+        return back()->with(
+            'error',
+            $item->product->name . ' does not have enough stock.'
+        );
+
+    }
+}
+   $order = Order::create([
+
+    'customer_id' => $customer->id,
+    'total' => $total,
+    'address' => $selectedAddress->address,
+    'status' => 'pending',
+
+    'coupon_id' => session('coupon_id'),
+    'original_total' => $originalTotal,
+    'discount_amount' => $discountAmount,
+    'discount_percent' => $discountPercent,
+]);
 
     foreach ($cart->items as $item) {
 
@@ -246,13 +298,13 @@ if (session()->has('coupon_id')) {
     ->where('color_id', $item->color_id)
     ->where('size_id', $item->size_id)
     ->first();
-
 if ($stock) {
 
-    $stock->decrement(
-        'quantity',
-        $item->quantity
-    );
+    $newQuantity = $stock->quantity - $item->quantity;
+
+    $stock->update([
+        'quantity' => max(0, $newQuantity)
+    ]);
 
 }
    
@@ -277,6 +329,35 @@ return redirect()
         'success',
         'Order created successfully. Total: '
         . $total . ' JD'
+    );
+}
+public function orders()
+{
+   $orders = \App\Models\Order::with(
+    'customer',
+    'coupon'
+)
+->latest()
+->get();
+
+    return view(
+        'orders.index',
+        compact('orders')
+    );
+}
+public function orderDetails(\App\Models\Order $order)
+{
+    $order->load(
+        'customer',
+        'coupon',
+        'items.product',
+        'items.color',
+        'items.size'
+    );
+
+    return view(
+        'orders.details',
+        compact('order')
     );
 }
 }

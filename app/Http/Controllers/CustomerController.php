@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
-
+use App\Models\CustomerAddress;
 class CustomerController extends Controller
 {
     public function index()
@@ -61,4 +61,60 @@ class CustomerController extends Controller
             'Address updated successfully.'
         );
     }
+    public function addresses()
+{
+    $addresses = CustomerAddress::where(
+        'customer_id',
+        auth('customer')->id()
+    )->get();
+
+    return view(
+        'customer.addresses',
+        compact('addresses')
+    );
+}
+public function createAddress()
+{
+    return view(
+        'customer.address-create'
+    );
+}
+public function storeAddress(Request $request)
+{
+    CustomerAddress::create([
+
+        'customer_id' => auth('customer')->id(),
+
+        'title' => $request->title,
+
+        'address' => $request->address,
+
+    ]);
+
+    return redirect()
+        ->route('customer.addresses')
+        ->with(
+            'success',
+            'Address Added Successfully'
+        );
+}
+
+public function deleteAddress(CustomerAddress $address)
+{
+    if (
+        $address->customer_id !=
+        auth('customer')->id()
+    ) {
+
+        abort(403);
+
+    }
+
+    $address->delete();
+
+    return back()->with(
+        'success',
+        'Address Deleted Successfully'
+    );
+}
 }

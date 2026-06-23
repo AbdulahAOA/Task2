@@ -6,6 +6,25 @@
         </h2>
     </x-slot>
 
+    <div class="text-center mb-5">
+
+    <h1 class="text-warning fw-bold">
+        Welcome To Product Store
+    </h1>
+
+    <p class="text-light">
+        Browse products and login to start shopping.
+    </p>
+
+    <a
+        href="{{ route('customer.login') }}"
+        class="btn btn-warning btn-lg"
+    >
+        Customer Login
+    </a>
+
+</div>
+
     <div class="container mt-4">
 
         <div class="row">

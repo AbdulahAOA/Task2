@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="d-flex align-items-center">
-            <i class="fa-solid fa-users fa-lg me-2"></i>
-            <span>Customers Management</span>
+            <i class="fa-solid fa-truck fa-lg me-2"></i>
+            <span>Orders Management</span>
         </div>
     </x-slot>
 
@@ -61,10 +61,21 @@
         .table-glass tbody tr { transition: all 0.3s; }
         .table-glass tbody tr:hover { background: rgba(255, 193, 7, 0.04); }
 
-        .btn-view-cart {
-            background: rgba(255, 193, 7, 0.15);
-            border: 1px solid rgba(255, 193, 7, 0.2);
-            color: #ffc107;
+        .badge-status {
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .badge-status.bg-success { background: rgba(34, 197, 94, 0.2) !important; color: #22c55e; }
+        .badge-status.bg-danger { background: rgba(239, 68, 68, 0.2) !important; color: #ef4444; }
+        .badge-status.bg-warning { background: rgba(255, 193, 7, 0.2) !important; color: #ffc107; }
+        .badge-status.bg-info { background: rgba(14, 165, 233, 0.2) !important; color: #0ea5e9; }
+
+        .btn-details {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
             padding: 6px 16px;
             border-radius: 8px;
             font-size: 0.8rem;
@@ -72,12 +83,13 @@
             text-decoration: none;
             display: inline-block;
         }
-        .btn-view-cart:hover {
-            background: rgba(255, 193, 7, 0.25);
-            color: #ffc107;
+        .btn-details:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #3b82f6;
+            color: #60a5fa;
             transform: scale(1.05);
         }
-        .btn-view-cart i { margin-right: 6px; }
+        .btn-details i { margin-right: 4px; }
 
         .empty-state {
             text-align: center;
@@ -102,35 +114,52 @@
     <div class="container mt-4">
         <div class="glass-card card">
             <div class="card-header">
-                <h4><i class="fa-regular fa-users"></i> Customers List</h4>
+                <h4><i class="fa-regular fa-list"></i> Orders List</h4>
             </div>
             <div class="card-body">
 
-                @if($customers->count())
+                @if($orders->count())
                     <div class="table-responsive">
                         <table class="table table-glass">
                             <thead>
                                 <tr>
                                     <th><i class="fa-regular fa-hashtag me-1"></i> ID</th>
-                                    <th><i class="fa-regular fa-user me-1"></i> Name</th>
-                                    <th><i class="fa-regular fa-phone me-1"></i> Phone</th>
-                                    <th><i class="fa-regular fa-envelope me-1"></i> Email</th>
-                                    <th><i class="fa-regular fa-calendar me-1"></i> Created At</th>
-                                    <th><i class="fa-regular fa-cart-shopping me-1"></i> Actions</th>
+                                    <th><i class="fa-regular fa-user me-1"></i> Customer</th>
+                                    <th><i class="fa-regular fa-money-bill-1 me-1"></i> Total</th>
+                                    <th><i class="fa-regular fa-circle-check me-1"></i> Status</th>
+                                    <th><i class="fa-regular fa-ticket me-1"></i> Coupon</th>
+                                    <th><i class="fa-regular fa-code me-1"></i> Code</th>
+                                    <th><i class="fa-regular fa-calendar me-1"></i> Date</th>
+                                    <th><i class="fa-regular fa-eye me-1"></i> Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($customers as $customer)
+                                @foreach($orders as $order)
                                     <tr>
-                                        <td>#{{ $customer->id }}</td>
-                                        <td>{{ $customer->name }}</td>
-                                        <td>{{ $customer->phone ?? '-' }}</td>
-                                        <td>{{ $customer->email }}</td>
-                                        <td>{{ $customer->created_at->format('d M Y') }}</td>
+                                        <td><span style="color: #ffc107; font-weight: 700;">#{{ $order->id }}</span></td>
+                                        <td>{{ $order->customer->name }}</td>
+                                        <td><span style="color: #ffc107; font-weight: 600;">{{ $order->total }}</span> JD</td>
                                         <td>
-                                            <a href="{{ route('customers.cart', $customer->id) }}"
-                                               class="btn-view-cart">
-                                                <i class="fa-regular fa-eye"></i> View Cart
+                                            @php
+                                                $statusColors = [
+                                                    'pending' => 'bg-warning',
+                                                    'processing' => 'bg-info',
+                                                    'completed' => 'bg-success',
+                                                    'cancelled' => 'bg-danger',
+                                                    'shipped' => 'bg-info'
+                                                ];
+                                                $color = $statusColors[$order->status] ?? 'bg-secondary';
+                                            @endphp
+                                            <span class="badge-status {{ $color }}">
+                                                {{ ucfirst($order->status) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $order->coupon ? '✅ Yes' : '❌ No' }}</td>
+                                        <td>{{ $order->coupon?->code ?? '-' }}</td>
+                                        <td>{{ $order->created_at->format('d M Y, H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('orders.details', $order->id) }}" class="btn-details">
+                                                <i class="fa-regular fa-eye"></i> Details
                                             </a>
                                         </td>
                                     </tr>
@@ -140,9 +169,9 @@
                     </div>
                 @else
                     <div class="empty-state">
-                        <i class="fa-regular fa-users-slash"></i>
-                        <h5>No Customers Found</h5>
-                        <p>There are no registered customers yet.</p>
+                        <i class="fa-regular fa-truck"></i>
+                        <h5>No Orders Found</h5>
+                        <p>There are no orders yet.</p>
                     </div>
                 @endif
 
